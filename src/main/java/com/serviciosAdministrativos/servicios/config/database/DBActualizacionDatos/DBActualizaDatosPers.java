@@ -1,4 +1,4 @@
-package com.serviciosAdministrativos.servicios.config.database.DBTwo;
+package com.serviciosAdministrativos.servicios.config.database.DBActualizacionDatos;
 
 import jakarta.persistence.EntityManagerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -20,44 +20,44 @@ import java.util.Map;
 @Configuration
 @EnableTransactionManagement
 @EnableJpaRepositories(
-        entityManagerFactoryRef = "db2ManagerFactory",
-        transactionManagerRef = "db2TransactionManager",
+        entityManagerFactoryRef = "db4ManagerFactory",
+        transactionManagerRef = "db4TransactionManager",
         basePackages = {
-                "com.serviciosAdministrativos.servicios.domain.repositories.DBTwo"
+                "com.serviciosAdministrativos.servicios.domain.repositories.DBActualizaDatosPers"
         }
 )
-public class DBVotaciones {
+public class DBActualizaDatosPers {
     private final Environment environment;
 
-    public DBVotaciones(Environment environment) { this.environment = environment; }
-
-    @Bean(name = "db2DataSource")
-    public DataSource dataSource2() {
-        return DataSourceBuilder.create()
-                .url(environment.getProperty("db2.datasource.jdbc.url"))
-                .driverClassName(environment.getProperty("db2.datasource.driver-class-name"))
-                .username(environment.getProperty("db2.datasource.username"))
-                .password(environment.getProperty("db2.datasource.password"))
-                .build();
+    public DBActualizaDatosPers(Environment environment) {
+        this.environment = environment;
     }
 
-    @Bean(name = "db2ManagerFactory")
-    public LocalContainerEntityManagerFactoryBean entityManagerFactoryBean2() {
+    @Bean(name = "db4DataSource")
+    public DataSource dataSource4() {
+        return DataSourceBuilder.create()
+                .url(environment.getProperty("db4.datasource.jdbc.url"))
+                .driverClassName(environment.getProperty("db4.datasource.driver-class-name"))
+                .username(environment.getProperty("db4.datasource.username"))
+                .password(environment.getProperty("db4.datasource.password"))
+                .build();
+    }
+    @Bean(name = "db4ManagerFactory")
+    public LocalContainerEntityManagerFactoryBean entityManagerFactoryBean() {
         LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
-        factoryBean.setDataSource(dataSource2());
-        factoryBean.setPackagesToScan("com.serviciosAdministrativos.servicios.domain.entities.DBTwo");
+        factoryBean.setDataSource(dataSource4());
+        factoryBean.setPackagesToScan("com.serviciosAdministrativos.servicios.domain.entities.DBActualizaDatosPers");
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         factoryBean.setJpaVendorAdapter(vendorAdapter);
         Map<String, Object> properties = new HashMap<>();
-        properties.put("hibernate.default_schema", "vot");
-        properties.put("hibernate.dialect", environment.getProperty("db2.jpa.properties.hibernate.dialect"));
+        properties.put("hibernate.dialect", environment.getProperty("db4.jpa.properties.hibernate.dialect"));
         factoryBean.setJpaPropertyMap(properties);
         return factoryBean;
     }
 
-    @Bean(name = "db2TransactionManager")
-    public PlatformTransactionManager platformTransactionManager2(
-            @Qualifier(value = "db2ManagerFactory") EntityManagerFactory entityManagerFactory
+    @Bean(name = "db4TransactionManager")
+    public PlatformTransactionManager platformTransactionManager3(
+            @Qualifier(value = "db4ManagerFactory") EntityManagerFactory entityManagerFactory
     ) {
         return new JpaTransactionManager(entityManagerFactory);
     }
