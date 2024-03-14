@@ -157,8 +157,8 @@ public class DatosEmpleadoServiceImpl implements DatosEmpleadoService {
     }
 
     @Override
-//    @Scheduled(cron = "0 0 0 * * *")
-    @Scheduled(cron = "30 * * * * *")
+    @Scheduled(cron = "0 0 0 * * *")
+//    @Scheduled(cron = "30 * * * * *")
     public void insertActualizaDatos() {
         Optional<FechasEntity> firstFecha = fechasRepository.findFirstFecha();
 
@@ -199,8 +199,12 @@ public class DatosEmpleadoServiceImpl implements DatosEmpleadoService {
                 usrRhhActualizaDatosToSave.setJefe_inm(stringObjectMap.get("jefe_inm") != null ? stringObjectMap.get("jefe_inm").toString() : null);
                 usrRhhActualizaDatosToSave.setNum_tel(stringObjectMap.get("num_tel") != null ? stringObjectMap.get("num_tel").toString() : null);
 
-                LocalDateTime fechaHora = LocalDateTime.parse(stringObjectMap.get("fec_ing").toString(), formatter);
-                usrRhhActualizaDatosToSave.setFec_ing(stringObjectMap.get("fec_ing") != null ? fechaHora : null);
+                if (stringObjectMap.get("fec_ing") != null) {
+                    LocalDateTime fechaHora = LocalDateTime.parse(stringObjectMap.get("fec_ing").toString(), formatter);
+                    usrRhhActualizaDatosToSave.setFec_ing(stringObjectMap.get("fec_ing") != null ? fechaHora : null);
+                } else {
+                    usrRhhActualizaDatosToSave.setFec_ing(null);
+                }
 
                 LocalDateTime fechaTer = LocalDateTime.parse(stringObjectMap.get("fec_ter").toString(), formatter);
                 usrRhhActualizaDatosToSave.setFec_ter(stringObjectMap.get("fec_ter") != null ? fechaTer : null);
