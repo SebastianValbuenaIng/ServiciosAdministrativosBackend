@@ -50,7 +50,6 @@ public class DatosEmpleadoServiceImpl implements DatosEmpleadoService {
 
     private DatosEmpleadoRedesSocialesResponse entityToResponse(DatosEmpleadoEntity datosEmpleadoEntity,
                                                                 List<RedesSocialesEntity> redesSocialesByEmpleado) {
-
         List<Map<String, Object>> redes_sociales = redesSocialesByEmpleado.stream().map(redesSocialesEntity -> {
             Map<String, Object> red_social = new LinkedHashMap<>();
             red_social.put("cod_red_soc", redesSocialesEntity.getCodRedsoc());
@@ -157,8 +156,8 @@ public class DatosEmpleadoServiceImpl implements DatosEmpleadoService {
     }
 
     @Override
-    @Scheduled(cron = "0 0 0 * * *")
-//    @Scheduled(cron = "30 * * * * *")
+//    @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(cron = "30 * * * * *")
     public void insertActualizaDatos() {
         Optional<FechasEntity> firstFecha = fechasRepository.findFirstFecha();
 
@@ -183,11 +182,13 @@ public class DatosEmpleadoServiceImpl implements DatosEmpleadoService {
 
                 usrRhhActualizaDatosToSave.setDescrip_publicacion(resultPublicacion);
 
-                usrRhhActualizaDatosToSave.setUbicacion(stringObjectMap.get("ubicacion") != null ? stringObjectMap.get("ubicacion").toString().trim().isEmpty() ?
-                        null : stringObjectMap.get("ubicacion").toString() : null);
+                usrRhhActualizaDatosToSave.setUbicacion(stringObjectMap.get("ubicacion").toString().trim().isEmpty()
+                                ? null
+                                : stringObjectMap.get("ubicacion").toString());
 
-                usrRhhActualizaDatosToSave.setUsr_num_ext(stringObjectMap.get("usr_num_ext") != null ?
-                        Integer.parseInt(stringObjectMap.get("usr_num_ext").toString().trim()) != 0 ? stringObjectMap.get("usr_num_ext").toString() : null : null);
+                usrRhhActualizaDatosToSave.setUsr_num_ext(Integer.parseInt(stringObjectMap.get("usr_num_ext").toString().trim()) != 0
+                        ? stringObjectMap.get("usr_num_ext").toString()
+                        : null);
 
                 usrRhhActualizaDatosToSave.setId_interes(stringObjectMap.get("cod_area") != null ? Integer.parseInt(stringObjectMap.get("cod_area").toString()) : null);
                 usrRhhActualizaDatosToSave.setNom_empr(stringObjectMap.get("nom_empr") != null ? stringObjectMap.get("nom_empr").toString() : null);
@@ -202,7 +203,8 @@ public class DatosEmpleadoServiceImpl implements DatosEmpleadoService {
                 if (stringObjectMap.get("fec_ing") != null) {
                     LocalDateTime fechaHora = LocalDateTime.parse(stringObjectMap.get("fec_ing").toString(), formatter);
                     usrRhhActualizaDatosToSave.setFec_ing(stringObjectMap.get("fec_ing") != null ? fechaHora : null);
-                } else {
+                }
+                else {
                     usrRhhActualizaDatosToSave.setFec_ing(null);
                 }
 
