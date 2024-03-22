@@ -1,8 +1,6 @@
 package com.serviciosAdministrativos.servicios.infrastructure.services.actualizacionDatos;
 
-import com.serviciosAdministrativos.servicios.domain.entities.DBActualizaDatosPers.DatosEmpleadoEntity;
 import com.serviciosAdministrativos.servicios.domain.entities.DBActualizaDatosPers.TitulosEmpleadoEntity;
-import com.serviciosAdministrativos.servicios.domain.repositories.DBActualizaDatosPers.DatosEmpleadoRepository;
 import com.serviciosAdministrativos.servicios.domain.repositories.DBActualizaDatosPers.TitulosEmpleadoRepository;
 import com.serviciosAdministrativos.servicios.infrastructure.abstract_services.actualizacionDatos.PerfilEmpleadoService;
 import com.serviciosAdministrativos.servicios.util.errors.NotFoundError;
@@ -25,14 +23,11 @@ import java.util.*;
 public class PerfilEmpleadoServiceImpl implements PerfilEmpleadoService {
     private final Environment environment;
     private final TitulosEmpleadoRepository titulosEmpleadoRepository;
-    private final DatosEmpleadoRepository datosEmpleadoRepository;
 
     public PerfilEmpleadoServiceImpl(Environment environment,
-                                     TitulosEmpleadoRepository titulosEmpleadoRepository,
-                                     DatosEmpleadoRepository datosEmpleadoRepository) {
+                                     TitulosEmpleadoRepository titulosEmpleadoRepository) {
         this.environment = environment;
         this.titulosEmpleadoRepository = titulosEmpleadoRepository;
-        this.datosEmpleadoRepository = datosEmpleadoRepository;
     }
 
     @Override
@@ -49,10 +44,6 @@ public class PerfilEmpleadoServiceImpl implements PerfilEmpleadoService {
                                                    Integer ano_est,
                                                    LocalDate fec_gra,
                                                    String nro_tar) {
-        Optional<DatosEmpleadoEntity> findDatosEmpleado = datosEmpleadoRepository.findByCodEmp(documento);
-
-        if (findDatosEmpleado.isEmpty()) throw new NotFoundError("Empleado no encontrado");
-
         TitulosEmpleadoEntity titulosEmpleadoToSave = new TitulosEmpleadoEntity();
         titulosEmpleadoToSave.setCodEmp(documento);
 

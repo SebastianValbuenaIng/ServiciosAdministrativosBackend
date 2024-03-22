@@ -1,9 +1,7 @@
 package com.serviciosAdministrativos.servicios.infrastructure.services.actualizacionDatos;
 
 import com.serviciosAdministrativos.servicios.api.models.actualizacionDatos.request.AgregarIdiomaRequest;
-import com.serviciosAdministrativos.servicios.domain.entities.DBActualizaDatosPers.DatosEmpleadoEntity;
 import com.serviciosAdministrativos.servicios.domain.entities.DBActualizaDatosPers.IdiomasEntity;
-import com.serviciosAdministrativos.servicios.domain.repositories.DBActualizaDatosPers.DatosEmpleadoRepository;
 import com.serviciosAdministrativos.servicios.domain.repositories.DBActualizaDatosPers.IdiomasRepository;
 import com.serviciosAdministrativos.servicios.infrastructure.abstract_services.actualizacionDatos.IdiomaService;
 import com.serviciosAdministrativos.servicios.util.errors.NotFoundError;
@@ -16,11 +14,9 @@ import java.util.Optional;
 @Service
 public class IdiomaServiceImpl implements IdiomaService {
     private final IdiomasRepository idiomasRepository;
-    private final DatosEmpleadoRepository datosEmpleadoRepository;
 
-    public IdiomaServiceImpl(IdiomasRepository idiomasRepository, DatosEmpleadoRepository datosEmpleadoRepository) {
+    public IdiomaServiceImpl(IdiomasRepository idiomasRepository) {
         this.idiomasRepository = idiomasRepository;
-        this.datosEmpleadoRepository = datosEmpleadoRepository;
     }
 
     @Override
@@ -30,10 +26,6 @@ public class IdiomaServiceImpl implements IdiomaService {
 
     @Override
     public IdiomasEntity saveNewIdiomaEmpleado(String documento, AgregarIdiomaRequest agregarIdiomaRequest) {
-        Optional<DatosEmpleadoEntity> findDatosEmpleadoByDocumento = datosEmpleadoRepository.findByCodEmp(documento);
-
-        if (findDatosEmpleadoByDocumento.isEmpty()) throw new NotFoundError("El empleado no existe");
-
         IdiomasEntity idiomaToSave = new IdiomasEntity(
                 agregarIdiomaRequest.getCod_idioma(),
                 documento,

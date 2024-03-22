@@ -1,9 +1,7 @@
 package com.serviciosAdministrativos.servicios.infrastructure.services.actualizacionDatos;
 
 import com.serviciosAdministrativos.servicios.api.models.actualizacionDatos.request.PerfilWebRequest;
-import com.serviciosAdministrativos.servicios.domain.entities.DBActualizaDatosPers.DatosEmpleadoEntity;
 import com.serviciosAdministrativos.servicios.domain.entities.DBActualizaDatosPers.PerfilWebEntity;
-import com.serviciosAdministrativos.servicios.domain.repositories.DBActualizaDatosPers.DatosEmpleadoRepository;
 import com.serviciosAdministrativos.servicios.domain.repositories.DBActualizaDatosPers.PerfilWebRepository;
 import com.serviciosAdministrativos.servicios.infrastructure.abstract_services.actualizacionDatos.PerfilWebService;
 import com.serviciosAdministrativos.servicios.util.errors.NotFoundError;
@@ -14,12 +12,9 @@ import java.util.Optional;
 
 @Service
 public class PerfilWebServiceImpl implements PerfilWebService {
-    private final DatosEmpleadoRepository datosEmpleadoRepository;
     private final PerfilWebRepository perfilWebRepository;
 
-    public PerfilWebServiceImpl(DatosEmpleadoRepository datosEmpleadoRepository,
-                                PerfilWebRepository perfilWebRepository) {
-        this.datosEmpleadoRepository = datosEmpleadoRepository;
+    public PerfilWebServiceImpl(PerfilWebRepository perfilWebRepository) {
         this.perfilWebRepository = perfilWebRepository;
     }
 
@@ -34,10 +29,6 @@ public class PerfilWebServiceImpl implements PerfilWebService {
 
     @Override
     public Map<String, String> postPerfilWeb(String documento, PerfilWebRequest perfilWebRequest) {
-        Optional<DatosEmpleadoEntity> findDatosEmpleado = datosEmpleadoRepository.findByCodEmp(documento);
-
-        if (findDatosEmpleado.isEmpty()) throw new NotFoundError("Datos de empleado no existen");
-
         Optional<PerfilWebEntity> findPerfilWebByEmpleado = perfilWebRepository.findByCodEmp(documento);
 
         if (findPerfilWebByEmpleado.isEmpty()) {

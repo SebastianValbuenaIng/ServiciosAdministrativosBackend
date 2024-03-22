@@ -1,10 +1,7 @@
 package com.serviciosAdministrativos.servicios.infrastructure.services.actualizacionDatos;
 
 import com.serviciosAdministrativos.servicios.api.models.actualizacionDatos.request.AgregarFamiliarRequest;
-import com.serviciosAdministrativos.servicios.domain.entities.DBActualizaDatosPers.DatosEmpleadoEntity;
-import com.serviciosAdministrativos.servicios.domain.entities.DBActualizaDatosPers.ExperienciaEntity;
 import com.serviciosAdministrativos.servicios.domain.entities.DBActualizaDatosPers.FamiliaEmpleadoEntity;
-import com.serviciosAdministrativos.servicios.domain.repositories.DBActualizaDatosPers.DatosEmpleadoRepository;
 import com.serviciosAdministrativos.servicios.domain.repositories.DBActualizaDatosPers.FamiliaEmpleadoRepository;
 import com.serviciosAdministrativos.servicios.infrastructure.abstract_services.actualizacionDatos.FamiliarService;
 import com.serviciosAdministrativos.servicios.util.errors.NotFoundError;
@@ -16,11 +13,9 @@ import java.util.Optional;
 
 @Service
 public class FamiliarServiceImpl implements FamiliarService {
-    private final DatosEmpleadoRepository datosEmpleadoRepository;
     private final FamiliaEmpleadoRepository familiaEmpleadoRepository;
 
-    public FamiliarServiceImpl(DatosEmpleadoRepository datosEmpleadoRepository, FamiliaEmpleadoRepository familiaEmpleadoRepository) {
-        this.datosEmpleadoRepository = datosEmpleadoRepository;
+    public FamiliarServiceImpl(FamiliaEmpleadoRepository familiaEmpleadoRepository) {
         this.familiaEmpleadoRepository = familiaEmpleadoRepository;
     }
 
@@ -31,10 +26,6 @@ public class FamiliarServiceImpl implements FamiliarService {
 
     @Override
     public FamiliaEmpleadoEntity newFamiliarByEmpleado(String documento, AgregarFamiliarRequest agregarFamiliarRequest) {
-        Optional<DatosEmpleadoEntity> findDatosEmpleadoByDocumento = datosEmpleadoRepository.findByCodEmp(documento);
-
-        if (findDatosEmpleadoByDocumento.isEmpty()) throw new NotFoundError("El empleado no existe");
-
         FamiliaEmpleadoEntity familiaEmpleadoToSave = new FamiliaEmpleadoEntity(
                 documento,
                 agregarFamiliarRequest.getApellido_uno_familiar(),

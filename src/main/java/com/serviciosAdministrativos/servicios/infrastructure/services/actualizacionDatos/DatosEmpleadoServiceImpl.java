@@ -14,6 +14,7 @@ import com.serviciosAdministrativos.servicios.infrastructure.abstract_services.a
 import com.serviciosAdministrativos.servicios.util.errors.NotFoundError;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -99,7 +100,7 @@ public class DatosEmpleadoServiceImpl implements DatosEmpleadoService {
                             .findByCodRedsocAndCodEmp((Integer) stringObjectMap.get("cod_red_soc"), documento);
 
                     if (findByCodRedSoc.isPresent()) {
-                        if (!stringObjectMap.get("usuario_red").toString().trim().isEmpty()) {
+                        if (stringObjectMap.get("usuario_red") != null && !stringObjectMap.get("usuario_red").toString().trim().isEmpty()) {
                             findByCodRedSoc.get().setUsuario_red(stringObjectMap.get("usuario_red").toString());
                             redesSocialesRepository.save(findByCodRedSoc.get());
                         }
@@ -156,21 +157,24 @@ public class DatosEmpleadoServiceImpl implements DatosEmpleadoService {
     }
 
     @Override
-//    @Scheduled(cron = "0 0 0 * * *")
-    @Scheduled(cron = "30 * * * * *")
+    @Transactional(value = "db3TransactionManager")
+    @Scheduled(cron = "0 0 0 * * *")
+//    @Scheduled(cron = "15 * * * * *")
     public void insertActualizaDatos() {
         Optional<FechasEntity> firstFecha = fechasRepository.findFirstFecha();
 
         if (firstFecha.isEmpty()) throw new RuntimeException("No existe una fecha final para la actualizacion de datos");
 
         if (LocalDateTime.now().isBefore(firstFecha.get().getFecha_fin()) && LocalDateTime.now().isAfter(firstFecha.get().getFecha_ini())) {
+            usrRhhActualizaDatosRepository.deleteAll();
+
             List<Map<String, Object>> allDatosEmpleado = datosEmpleadoRepository.selectAllTablesActualizaDatosPers();
 
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
 
             allDatosEmpleado.forEach(stringObjectMap -> {
                 UsrRhhActualizaDatosEntity usrRhhActualizaDatosToSave = new UsrRhhActualizaDatosEntity();
-                usrRhhActualizaDatosToSave.setCod_emp(stringObjectMap.get("cod_emp") != null ? stringObjectMap.get("cod_emp").toString() : null);
+                usrRhhActualizaDatosToSave.setCod_emp(stringObjectMap.get("cod_emp_principal").toString());
                 usrRhhActualizaDatosToSave.setDir_res(stringObjectMap.get("dir_res") != null ? stringObjectMap.get("dir_res").toString() : null);
 
                 int resultRedSocial = Integer.parseInt(stringObjectMap.get("cod_redsoc") != null ? stringObjectMap.get("cod_redsoc").toString() : "999");
@@ -182,9 +186,10 @@ public class DatosEmpleadoServiceImpl implements DatosEmpleadoService {
 
                 usrRhhActualizaDatosToSave.setDescrip_publicacion(resultPublicacion);
 
-                usrRhhActualizaDatosToSave.setUbicacion(stringObjectMap.get("ubicacion").toString().trim().isEmpty()
-                                ? null
-                                : stringObjectMap.get("ubicacion").toString());
+                usrRhhActualizaDatosToSave.setUbicacion(stringObjectMap.get("ubicacion") != null
+                        ? stringObjectMap.get("ubicacion").toString().trim()
+                        : null
+                );
 
                 usrRhhActualizaDatosToSave.setUsr_num_ext(Integer.parseInt(stringObjectMap.get("usr_num_ext").toString().trim()) != 0
                         ? stringObjectMap.get("usr_num_ext").toString()
@@ -208,8 +213,12 @@ public class DatosEmpleadoServiceImpl implements DatosEmpleadoService {
                     usrRhhActualizaDatosToSave.setFec_ing(null);
                 }
 
-                LocalDateTime fechaTer = LocalDateTime.parse(stringObjectMap.get("fec_ter").toString(), formatter);
-                usrRhhActualizaDatosToSave.setFec_ter(stringObjectMap.get("fec_ter") != null ? fechaTer : null);
+                if (stringObjectMap.get("fec_ter") != null) {
+                    LocalDateTime fechaTer = LocalDateTime.parse(stringObjectMap.get("fec_ter").toString(), formatter);
+                    usrRhhActualizaDatosToSave.setFec_ter(stringObjectMap.get("fec_ter") != null ? fechaTer : null);
+                } else {
+                    usrRhhActualizaDatosToSave.setFec_ter(null);
+                }
 
                 usrRhhActualizaDatosToSave.setPai_res(stringObjectMap.get("pais_res") != null ? stringObjectMap.get("pais_res").toString() : null);
                 usrRhhActualizaDatosToSave.setDpt_res(stringObjectMap.get("dpt_res") != null ? stringObjectMap.get("dpt_res").toString() : null);
@@ -220,8 +229,12 @@ public class DatosEmpleadoServiceImpl implements DatosEmpleadoService {
                 usrRhhActualizaDatosToSave.setCod_ins(stringObjectMap.get("cod_ins") != null ? stringObjectMap.get("cod_ins").toString() : null);
                 usrRhhActualizaDatosToSave.setAno_est(stringObjectMap.get("ano_est") != null ? Integer.parseInt(stringObjectMap.get("ano_est").toString()) : null);
 
-                LocalDateTime fechaGra = LocalDateTime.parse(stringObjectMap.get("fec_gra").toString(), formatter);
-                usrRhhActualizaDatosToSave.setFec_gra(stringObjectMap.get("fec_gra") != null ? fechaGra : null);
+                if (stringObjectMap.get("fec_gra") != null) {
+                    LocalDateTime fechaGra = LocalDateTime.parse(stringObjectMap.get("fec_gra").toString(), formatter);
+                    usrRhhActualizaDatosToSave.setFec_gra(stringObjectMap.get("fec_gra") != null ? fechaGra : null);
+                } else {
+                    usrRhhActualizaDatosToSave.setFec_gra(null);
+                }
 
                 usrRhhActualizaDatosToSave.setNro_tar(stringObjectMap.get("nro_tar") != null ? stringObjectMap.get("nro_tar").toString() : null);
                 usrRhhActualizaDatosToSave.setCod_idi(stringObjectMap.get("cod_idi") != null ? stringObjectMap.get("cod_idi").toString() : null);
@@ -237,8 +250,12 @@ public class DatosEmpleadoServiceImpl implements DatosEmpleadoService {
                 usrRhhActualizaDatosToSave.setTip_ide(stringObjectMap.get("tip_ide") != null ? stringObjectMap.get("tip_ide").toString() : null);
                 usrRhhActualizaDatosToSave.setNum_ced(stringObjectMap.get("num_ced") != null ? stringObjectMap.get("num_ced").toString() : null);
 
-                LocalDateTime fecNac = LocalDateTime.parse(stringObjectMap.get("fec_nac").toString(), formatter);
-                usrRhhActualizaDatosToSave.setFec_nac(stringObjectMap.get("fec_nac") != null ? fecNac : null);
+                if (stringObjectMap.get("fec_nac") != null) {
+                    LocalDateTime fecNac = LocalDateTime.parse(stringObjectMap.get("fec_nac").toString(), formatter);
+                    usrRhhActualizaDatosToSave.setFec_nac(stringObjectMap.get("fec_nac") != null ? fecNac : null);
+                } else {
+                    usrRhhActualizaDatosToSave.setFec_nac(null);
+                }
 
                 usrRhhActualizaDatosToSave.setSex_fam(stringObjectMap.get("sex_fam") != null ? Integer.parseInt(stringObjectMap.get("sex_fam").toString()) : null);
                 usrRhhActualizaDatosToSave.setEst_civ_fam(stringObjectMap.get("est_civ_fam") != null ? Integer.parseInt(stringObjectMap.get("est_civ_fam").toString()) : null);
@@ -259,10 +276,10 @@ public class DatosEmpleadoServiceImpl implements DatosEmpleadoService {
                 usrRhhActualizaDatosToSave.setFec_registro(LocalDateTime.now());
 
                 usrRhhActualizaDatosToSave.setPerfil(
-                        "Párrafo 1: " + (stringObjectMap.get("parrafo1") != null ? stringObjectMap.get("parrafo1").toString() : "") + "\\n"
-                        + "Párrafo 2: " + (stringObjectMap.get("parrafo2") != null ? stringObjectMap.get("parrafo2").toString() : "") + "\\n"
-                        + "DISTINCIONES: " + (stringObjectMap.get("reconocimientos") != null ? stringObjectMap.get("reconocimientos").toString() : "") + "\\n"
-                        + "Membresias: " + (stringObjectMap.get("membresias") != null ? stringObjectMap.get("membresias").toString() : "") + "\\n"
+                        "Párrafo 1: " + (stringObjectMap.get("parrafo1") != null ? stringObjectMap.get("parrafo1").toString() : "") + "\n"
+                        + "Párrafo 2: " + (stringObjectMap.get("parrafo2") != null ? stringObjectMap.get("parrafo2").toString() : "") + "\n"
+                        + "DISTINCIONES: " + (stringObjectMap.get("reconocimientos") != null ? stringObjectMap.get("reconocimientos").toString() : "") + "\n"
+                        + "Membresias: " + (stringObjectMap.get("membresias") != null ? stringObjectMap.get("membresias").toString() : "") + "\n"
                         + "Cargos: " + (stringObjectMap.get("cargo_direc") != null ? stringObjectMap.get("cargo_direc").toString() : "")
                 );
 

@@ -1,9 +1,7 @@
 package com.serviciosAdministrativos.servicios.infrastructure.services.actualizacionDatos;
 
 import com.serviciosAdministrativos.servicios.api.models.actualizacionDatos.request.AgregarPublicacionRequest;
-import com.serviciosAdministrativos.servicios.domain.entities.DBActualizaDatosPers.DatosEmpleadoEntity;
 import com.serviciosAdministrativos.servicios.domain.entities.DBActualizaDatosPers.PublicacionesEntity;
-import com.serviciosAdministrativos.servicios.domain.repositories.DBActualizaDatosPers.DatosEmpleadoRepository;
 import com.serviciosAdministrativos.servicios.domain.repositories.DBActualizaDatosPers.PublicacionesRepository;
 import com.serviciosAdministrativos.servicios.infrastructure.abstract_services.actualizacionDatos.PublicacionService;
 import com.serviciosAdministrativos.servicios.util.errors.NotFoundError;
@@ -16,11 +14,9 @@ import java.util.Optional;
 @Service
 public class PublicacionServiceImpl implements PublicacionService {
     private final PublicacionesRepository publicacionesRepository;
-    private final DatosEmpleadoRepository datosEmpleadoRepository;
 
-    public PublicacionServiceImpl(PublicacionesRepository publicacionesRepository, DatosEmpleadoRepository datosEmpleadoRepository) {
+    public PublicacionServiceImpl(PublicacionesRepository publicacionesRepository) {
         this.publicacionesRepository = publicacionesRepository;
-        this.datosEmpleadoRepository = datosEmpleadoRepository;
     }
 
     @Override
@@ -30,10 +26,6 @@ public class PublicacionServiceImpl implements PublicacionService {
 
     @Override
     public PublicacionesEntity saveNewPublicacionEmpleado(String documento, AgregarPublicacionRequest agregarPublicacionRequest) {
-        Optional<DatosEmpleadoEntity> findDatosEmpleadoByDocumento = datosEmpleadoRepository.findByCodEmp(documento);
-
-        if (findDatosEmpleadoByDocumento.isEmpty()) throw new NotFoundError("El empleado no existe");
-
         PublicacionesEntity publicacionToSaved = new PublicacionesEntity(
                 documento,
                 agregarPublicacionRequest.getTitulo_public(),

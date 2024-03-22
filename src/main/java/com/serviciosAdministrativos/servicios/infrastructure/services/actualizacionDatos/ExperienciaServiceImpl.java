@@ -9,6 +9,8 @@ import com.serviciosAdministrativos.servicios.infrastructure.abstract_services.a
 import com.serviciosAdministrativos.servicios.util.errors.NotFoundError;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -16,11 +18,9 @@ import java.util.Optional;
 @Service
 public class ExperienciaServiceImpl implements ExperienciaService {
     private final ExperienciaRepository experienciaRepository;
-    private final DatosEmpleadoRepository datosEmpleadoRepository;
 
-    public ExperienciaServiceImpl(ExperienciaRepository experienciaRepository, DatosEmpleadoRepository datosEmpleadoRepository) {
+    public ExperienciaServiceImpl(ExperienciaRepository experienciaRepository) {
         this.experienciaRepository = experienciaRepository;
-        this.datosEmpleadoRepository = datosEmpleadoRepository;
     }
 
     @Override
@@ -30,9 +30,8 @@ public class ExperienciaServiceImpl implements ExperienciaService {
 
     @Override
     public ExperienciaEntity saveNewExperienceEmpleado(String documento, ExperienciaRequest experienciaRequest) {
-        Optional<DatosEmpleadoEntity> findDatosEmpleadoByDocumento = datosEmpleadoRepository.findByCodEmp(documento);
-
-        if (findDatosEmpleadoByDocumento.isEmpty()) throw new NotFoundError("El empleado no existe");
+        if (experienciaRequest.getFec_ter().isAfter(LocalDate.now()) || experienciaRequest.getFec_ter().isEqual(LocalDate.now()))
+            throw new NotFoundError("La fecha de terminación debe ser menor a la fecha actual");
 
         ExperienciaEntity experienciaEntityToSave = new ExperienciaEntity(
                 documento,
@@ -56,6 +55,9 @@ public class ExperienciaServiceImpl implements ExperienciaService {
         Optional<ExperienciaEntity> findExperienciaById = experienciaRepository.findById(id_experiencia);
 
         if (findExperienciaById.isEmpty()) throw new NotFoundError("Experiencia no encontrada");
+
+        if (experienciaRequest.getFec_ter().isAfter(LocalDate.now()) || experienciaRequest.getFec_ter().isEqual(LocalDate.now()))
+            throw new NotFoundError("La fecha de terminación debe ser menor a la fecha actual");
 
         findExperienciaById.get().setNomEmpr(experienciaRequest.getNomEmpr());
         findExperienciaById.get().setNom_car(experienciaRequest.getNom_car());
